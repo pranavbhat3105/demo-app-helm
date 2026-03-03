@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-app
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: demo=your-actual-dockerhub-user/demo-app
+    argocd-image-updater.argoproj.io/demo.update-strategy: newest-build
+    argocd-image-updater.argoproj.io/demo.allow-tags: regexp:^[0-9]+$
+    argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/write-back-target: helmvalues:demo-app/values.yaml
+    argocd-image-updater.argoproj.io/demo.helm.image-name: image.repository
+    argocd-image-updater.argoproj.io/demo.helm.image-tag: image.tag
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/your-actual-github-user/demo-app-helm.git
+    targetRevision: main
+    path: demo-app
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: demo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

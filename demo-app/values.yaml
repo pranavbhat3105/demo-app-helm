@@ -1,0 +1,20 @@
+# ArgoCD Image Updater will update image.tag automatically
+image:
+  repository: your-actual-dockerhub-user/demo-app
+  tag: "1"
+  pullPolicy: IfNotPresent
+
+replicaCount: 2
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
